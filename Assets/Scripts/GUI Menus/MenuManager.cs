@@ -3,13 +3,13 @@ using System.Collections;
 
 public class MenuManager : MonoBehaviour {
 	
-	public Menu CurrentMenu;
+	public Menu CurrentMenu; // Menu to show/menu being shown 
 	
 	public void Start(){
 		ShowMenu (CurrentMenu);
-		
 	}
 	
+    // Show new menu
 	public void ShowMenu(Menu menu){
         Debug.Log("SHOW MENU: " + menu.name);
 
@@ -24,5 +24,4 @@ public class MenuManager : MonoBehaviour {
     public void QuitGame() {
         Application.Quit();
     }
-	
 }

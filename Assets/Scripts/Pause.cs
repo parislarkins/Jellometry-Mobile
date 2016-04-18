@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class Pause : MonoBehaviour {
+    // SCRIPT NOT IN USE
 
     public bool isPaused;
     public CanvasGroup pausedCanvasGroup;

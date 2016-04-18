@@ -4,13 +4,14 @@ using System.Collections;
 
 public class Highscores : MonoBehaviour {
 
+    // Initialize
     public Text txtName;
     public Text txtHighscore;
     public Text txtTotalKills;
 
 	// Use this for initialization
 	void Start () {
-
+        // Set keys if they don't exist
         if (PlayerPrefs.HasKey("statUsername"))
             txtName.text = PlayerPrefs.GetString("statUsername");
 
@@ -21,8 +22,4 @@ public class Highscores : MonoBehaviour {
             txtTotalKills.text = "Total Kills: " + PlayerPrefs.GetInt("totalEnemiesKilled").ToString();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

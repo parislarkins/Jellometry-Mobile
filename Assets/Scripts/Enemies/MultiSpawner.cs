@@ -128,7 +128,7 @@ public class MultiSpawner : MonoBehaviour {
 							Instantiate(grunt,spawners[whichSpawner].transform.position,spawners[whichSpawner].transform.rotation);
 							grunts++;
 							spawnedGrunts++;
-                            StartCoroutine(wait(1f));
+							wait (1f);
 //							Debug.Log ("spawned grunts: " + spawnedGrunts);
 //							Debug.Log ("spawned tanks: " + spawnedTanks);
 //							Debug.Log ("spawned archers: " + spawnedArchers);
@@ -139,7 +139,7 @@ public class MultiSpawner : MonoBehaviour {
 							Instantiate(tank,spawners[whichSpawner].transform.position,spawners[whichSpawner].transform.rotation);
 							tanks++;
 							spawnedTanks++;
-                            StartCoroutine(wait(1f));
+							wait (1f);
 //							Debug.Log ("spawned grunts: " + spawnedGrunts);
 //							Debug.Log ("spawned tanks: " + spawnedTanks);
 //							Debug.Log ("spawned archers: " + spawnedArchers);
@@ -150,7 +150,7 @@ public class MultiSpawner : MonoBehaviour {
 							Instantiate(archer,spawners[whichSpawner].transform.position,spawners[whichSpawner].transform.rotation);
 							archers++;
 							spawnedArchers++;
-							StartCoroutine(wait (1f));
+							wait (1f);
 //							Debug.Log ("spawned grunts: " + spawnedGrunts);
 //							Debug.Log ("spawned tanks: " + spawnedTanks);
 //							Debug.Log ("spawned archers: " + spawnedArchers);
@@ -177,9 +177,7 @@ public class MultiSpawner : MonoBehaviour {
 	}
 
 	IEnumerator wait(float time){
-        Debug.Log("Before Waiting: Time " + Time.time);
-        yield return new WaitForSeconds(time);
-        Debug.Log("After Waiting: Time " + Time.time);
+		yield return new WaitForSeconds (time);
 	}
 
 	// Update is called once per frame

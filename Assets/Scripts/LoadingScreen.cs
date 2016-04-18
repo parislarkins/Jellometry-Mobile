@@ -3,58 +3,35 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class LoadingScreen : MonoBehaviour {
-
-	public string levelToLoad;
-
-	public GameObject panel;
-	public Text _text;
-	public Image progressBar;
-    public float animOpenLength = 1.0f;
-
+    
+    // Initializing Variables 
+    public string levelToLoad;
+	public Text _text; // Text for loading progress
+	public Image progressBar; // Image for loading progress
     private int loadProgress = 0;
 
     void Start() {
+        // Reset image x scale to 0
         progressBar.transform.localScale = new Vector3(0, progressBar.transform.localScale.y, progressBar.transform.localScale.z);
+        StartCoroutine(DisplayLoadingScreen(levelToLoad)); // Start loading the level
 
     }
-	
-	// Update is called once per frame
-	void Update () {
 
-        if (this.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Open"))
-            // I dont know wtf is going on but it works like this
-            
-            StartCoroutine(DisplayLoadingScreen(levelToLoad)); // uncommented
-            //StartCoroutine(StartTimer(animOpenLength));
-
-
-		if (Input.GetKeyDown(KeyCode.Space)){
-			StartCoroutine(DisplayLoadingScreen(levelToLoad));
-		}
-	}
-
-    IEnumerator StartTimer(float length) {
-
-        for (float i = length; i > 0; i -= Time.deltaTime)
-            yield return 0;
-
-        StartCoroutine(DisplayLoadingScreen(levelToLoad));
-        StopCoroutine("StartTimer");
-    }
-
+    // Corourtine for loading the next scene
 	IEnumerator DisplayLoadingScreen(string level){
-		panel.SetActive (true);
 
+        // Initialize Loading Percentage text and image
 		progressBar.transform.localScale = new Vector3 (loadProgress, progressBar.transform.localScale.y, progressBar.transform.localScale.z);
+		_text.text = "Loading Progress " + loadProgress + "%"; 
 
-		_text.text = "Loading Progress " + loadProgress + "%";
+		AsyncOperation async = Application.LoadLevelAsync (level); // Unity Magic
 
-		AsyncOperation async = Application.LoadLevelAsync (level);
-
+        // While not finished,
 		while (!async.isDone) {
 			loadProgress = (int)(async.progress * 100);
-			_text.text = "Loading Progress " + loadProgress + "%";
-            Debug.Log(loadProgress);
+			_text.text = "Loading Progress " + loadProgress + "%"; // Update Load Perc
+
+            // Update progress bar width
 			progressBar.transform.localScale = new Vector3 (async.progress, progressBar.transform.localScale.y, progressBar.transform.localScale.z);
 
 			yield return null;
