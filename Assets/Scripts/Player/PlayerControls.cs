@@ -1,56 +1,44 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
-public class PlayerControls : MonoBehaviour {
+public class PlayerControls : MonoBehaviour
+{
 
-	// ----------------------
-	// Controller Variable 
-	// ----------------------
-	
-	public	TouchController	ctrl;
-	
-	// ----------------------
-	// Constants
-	// ----------------------
-	
-	public const int STICK_WALK	= 0;
-	public const int STICK_FIRE	= 1;
-	// ----------------------
-	// User Made Variables
-	// ----------------------
+    // ----------------------
+    // User Made Variables
+    // ----------------------
 
-	// Movement
-	public float speed = 10;
-	public float moveSpeed = 10;
-	private float distToGround; // Distance from player to ground
-	private ParticleSystem movementParticles; 	// Reference to the particle system
+    // Movement
+    public float speed = 10;
+    public float moveSpeed = 10;
+    private float distToGround; // Distance from player to ground
+    private ParticleSystem movementParticles;   // Reference to the particle system
 
-	// Gun
+    // Gun
     public string weapon = "pistol";
     public int damage;
-	public int damagePerShot;                  // The damage inflicted by each bullet.
-	public float timeBetweenShots;        // The time between each shot.
-	public float timeBetweenBullets;
-	public float range;                      // The distance the gun can fire.
+    public int damagePerShot;                  // The damage inflicted by each bullet.
+    public float timeBetweenShots;        // The time between each shot.
+    public float timeBetweenBullets;
+    public float range;                      // The distance the gun can fire.
 
-	private float timer;
-	private Ray shootRay;
-	private RaycastHit shootHit;
-	private int shootableMask;
-	private ParticleSystem gunParticles;
+    private float timer;
+    private Ray shootRay;
+    private RaycastHit shootHit;
+    private int shootableMask;
+    private ParticleSystem gunParticles;
 
-	public GameObject hitParticles;
-	public ParticleSystem bulletParticles;
+    public GameObject hitParticles;
+    public ParticleSystem bulletParticles;
 
-	// Animator
-	private Animator playerAnimator;			// Reference to the animator component.
+    // Animator
+    private Animator playerAnimator;            // Reference to the animator component.
 
-	// Testing
-	private GameObject moveDirBlock;
+    // Testing
+    private GameObject moveDirBlock;
 
-	public float shootFasterStart = 0;
-	public float shootFasterDuration = 10;
+    public float shootFasterStart = 0;
+    public float shootFasterDuration = 10;
 
     public float moveFasterStart = 0;
     public float moveFasterDuration = 10;
@@ -63,43 +51,49 @@ public class PlayerControls : MonoBehaviour {
 
     public float reduceDamageStart = 0;
     public float reduceDamageDuration = 10;
-	// ----------------------
-	// Start()
-	// ----------------------
 
-	void Start(){
+
+
+    // ----------------------
+    // Start()
+    // ----------------------
+
+    void Start()
+    {
         SelectWeapon("pistol");
 
-		timeBetweenBullets = timeBetweenShots;
-		// Set up references.
-		playerAnimator = GetComponentInChildren <Animator>();
-		movementParticles = GameObject.Find ("WalkingParticles").GetComponent <ParticleSystem>();
+        timeBetweenBullets = timeBetweenShots;
+        // Set up references.
+        playerAnimator = GetComponentInChildren<Animator>();
+        movementParticles = GameObject.Find("WalkingParticles").GetComponent<ParticleSystem>();
 
-		// Gun
-		gunParticles = gameObject.GetComponentInChildren <ParticleSystem>();
-		shootableMask = LayerMask.GetMask ("Shootable");
+        // Gun
+        gunParticles = gameObject.GetComponentInChildren<ParticleSystem>();
+        shootableMask = LayerMask.GetMask("Shootable");
 
-		// Testing
-		moveDirBlock = GameObject.FindGameObjectWithTag ("MoveDir");
-		distToGround = transform.GetComponent<Collider> ().bounds.extents.y;
+        // Testing
+        moveDirBlock = GameObject.FindGameObjectWithTag("MoveDir");
+        distToGround = transform.GetComponent<Collider>().bounds.extents.y;
 
-	}
+    }
 
-	// ----------------------
-	// FixedUpdate()
-	// ----------------------
-	
-	void FixedUpdate()
-	{
-		if (shootFasterStart > 0 && Time.time - shootFasterStart >= shootFasterDuration) {
-			timeBetweenBullets += 0.05f;
-			shootFasterStart = 0;
-		}
+    // ----------------------
+    // FixedUpdate()
+    // ----------------------
+
+    void FixedUpdate()
+    {
+
+        if (shootFasterStart > 0 && Time.time - shootFasterStart >= shootFasterDuration)
+        {
+            timeBetweenBullets += 0.05f;
+            shootFasterStart = 0;
+        }
         if (moveFasterStart > 0 && Time.time - moveFasterStart >= moveFasterDuration)
         {
-			speed -= 3;
-			moveFasterStart = 0;
-		}
+            speed -= 3;
+            moveFasterStart = 0;
+        }
         if (moveSlowerStart > 0 && Time.time - moveSlowerStart >= moveSlowerDuration)
         {
             speed += 3;
@@ -115,103 +109,95 @@ public class PlayerControls : MonoBehaviour {
             damagePerShot += 5;
             reduceDamageStart = 0;
         }
-		// Gun Timer
-		timer += Time.deltaTime;
+        // Gun Timer
+        timer += Time.deltaTime;
 
-		if (this.ctrl != null)
-		{
-			// ----------------------
-			// Stick and Zone Variables
-			// ----------------------
-			
-			TouchStick	walkStick	= this.ctrl.GetStick(STICK_WALK);
-			TouchStick	fireStick	= this.ctrl.GetStick(STICK_FIRE);		
-			
-			// ----------------------
-			// Input Handling Code
-			// ----------------------
-			
-			// ----------------
-			// Stick 'Walk'...
-			// ----------------
+        float speedChanged = speed * Time.deltaTime;
 
-			if (walkStick.JustReleased()){
-				WalkingParticles(false, 0f);
-				Animating (false);
+        if (Input.anyKey)
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                transform.Translate(Vector3.forward * speedChanged);
+                checkGround();
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                transform.Translate(Vector3.left * speedChanged);
+                checkGround();
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+				transform.Translate(-Vector3.forward * speedChanged);
+                checkGround();
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                transform.Translate(Vector3.right * speedChanged);
+                checkGround();
+            }
+            if (Input.GetKey("space"))
+            {
+                if (timer >= timeBetweenBullets)
+                {
+                    Shoot();
+                }
+            }
+            if (Input.GetMouseButton(0))
+            {
+                if (timer >= timeBetweenBullets)
+                {
+                    Shoot();
+                }
+            }
+        }
+        else if (Input.GetKeyUp(KeyCode.A))
+        {
+            WalkingParticles(false, 0f);
+            Animating(false);
+        }
+    }
 
-			}
-			
-			if (walkStick.Pressed())
-			{
-				//Vector2	walkVec				= walkStick.GetVec();
-				float	walkTilt			= walkStick.GetTilt();
-				float	walkAngle			= walkStick.GetAngle();
-				//TouchStick.StickDir	walkDir	= walkStick.GetDigitalDir(true);
-				//Vector3	walkWorldVec		= walkStick.GetVec3d(false, 0);
-				
-				float speedChanged = speed * walkTilt * Time.deltaTime;
-				// Alter "speedChanged" depending on negative status effects
-				
-				//transform.Translate(tempDir * speedChanged, Space.World);
-				transform.Translate(moveDirBlock.transform.forward * speedChanged, Space.World);
+    void checkGround()
+    {
+        if (Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f))
+        {
+            WalkingParticles(true, 90f); // Activates walking particles if moving
+            Animating(true); // Activates animating
+        }
+        else
+        {
+            WalkingParticles(false, 0f);
+            Animating(false);
+        }
+    }
 
-				// Check if on the ground
-				if (Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f)){
-					WalkingParticles(true , walkTilt); // Activates walking particles if moving
-					Animating (true); // Activates animating
-				}
-				else{
-					WalkingParticles(false, 0f);
-					Animating (false);
-				}
+    void WalkingParticles(bool walking, float num)
+    {
 
-				// Move object to copy direction
-				moveDirBlock.transform.eulerAngles = new Vector3(0, walkAngle + 45, 0);
-			}
-			
-			// ----------------
-			// Stick 'Fire'...
-			// ----------------
-			
-			if (fireStick.Pressed())
-			{
-				//Vector2	fireVec				= fireStick.GetVec();
-				//float	fireTilt			= fireStick.GetTilt();
-				float	fireAngle			= fireStick.GetAngle();
-				//TouchStick.StickDir	fireDir	= fireStick.GetDigitalDir(true);
-				//Vector3	fireWorldVec		= fireStick.GetVec3d(false, 0);
-				// Change direction
-				transform.eulerAngles = new Vector3(0, fireAngle + 45, 0);
+        // Only activates if 
+        if (num > 0 && walking)
+        {
+            movementParticles.Play();
+        }
+        else
+        {
+            movementParticles.Stop();
+        }
+    }
 
-                // Firing the gun
-                if (timer >= timeBetweenBullets){
-				    Shoot();
-			    }
-			}
-		}
-	}
+    void Animating(bool walking)
+    {
+        // Tell the animator whether or not the player is walking.
+        playerAnimator.SetBool("IsWalking", walking);
 
-	void WalkingParticles(bool walking, float num){
+    }
 
-		// Only activates if 
-		if (num > 0 && walking) {
-			movementParticles.Play ();
-		}
-		else{
-			movementParticles.Stop();	
-		}
-	}
-	
-	void Animating (bool walking)
-	{		
-		// Tell the animator whether or not the player is walking.
-		playerAnimator.SetBool ("IsWalking", walking);
-		
-	}
-
-	// TESTING
-	void Shoot (){
-        switch (weapon) { 
+    // TESTING
+    void Shoot()
+    {
+        switch (weapon)
+        {
             case "pistol":
                 // Reset the timer.
                 timer = 0f;
@@ -266,35 +252,39 @@ public class PlayerControls : MonoBehaviour {
                 }
                 break;
         }
-		
-	}
-	
-	IEnumerator Wait(float time, ParticleSystem partSys){
-		yield return new WaitForSeconds (time); 
 
-		// Check if it hasn't already been destroyed
-		if (partSys != null)
-			partSys.Play();
-	}
+    }
 
-	IEnumerator WaitEnemy(float time, EnemyHealth enemyHealth){
-		yield return new WaitForSeconds (time);
+    IEnumerator Wait(float time, ParticleSystem partSys)
+    {
+        yield return new WaitForSeconds(time);
 
-		// Check if still exists
-		if (enemyHealth != null)
-			enemyHealth.TakeDamage (damagePerShot, shootHit.point);
+        // Check if it hasn't already been destroyed
+        if (partSys != null)
+            partSys.Play();
+    }
 
-	}
+    IEnumerator WaitEnemy(float time, EnemyHealth enemyHealth)
+    {
+        yield return new WaitForSeconds(time);
 
-    void SelectWeapon(string weaponName) {
-        switch (weaponName) { 
+        // Check if still exists
+        if (enemyHealth != null)
+            enemyHealth.TakeDamage(damagePerShot, shootHit.point);
+
+    }
+
+    void SelectWeapon(string weaponName)
+    {
+        switch (weaponName)
+        {
             case "pistol":
                 weapon = "pistol";
                 damage = 20;
-	            damagePerShot = 20;
-	            timeBetweenShots = 0.15f;
+                damagePerShot = 20;
+                timeBetweenShots = 0.15f;
                 timeBetweenBullets = 0.15f;
-	            range = 100f;
+                range = 100f;
                 //change model/texture/particles n shit?
                 break;
             case "shotgun":

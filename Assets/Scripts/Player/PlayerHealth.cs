@@ -31,6 +31,8 @@ public class PlayerHealth : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+        // Set to dead if no health
 		if (currentHealth <= 0 && !dead){			
 			statsManager.Dead(scoreManager.score);
 			dead = true;
@@ -50,6 +52,7 @@ public class PlayerHealth : MonoBehaviour {
 			
 		}
 		
+        // check if fallen off level
 		if(gameObject.transform.position.y < -14){
 			TakeDamage(currentHealth);
 		}
@@ -65,17 +68,22 @@ public class PlayerHealth : MonoBehaviour {
 		}
 		scoreManager.health = Convert.ToInt32 (currentHealth);
 	}
+
+    // Load levels
 	void LoadLevel(){
 		if (canExit) {
 			Application.LoadLevel (Application.loadedLevel);
 		}
 	}
+
+    // Take damage from other sources
 	void TakeDamage(float damageTaken){
 		currentHealth -= damageTaken;
 		scoreManager.damageTaken += Convert.ToInt32 (damageTaken);
 		
 	}
 	
+    // Hit by archer bullet
 	void OnCollisionEnter(Collision collision){
 		if (collision.gameObject.tag == "Archerbullet"){
 			TakeDamage(20);

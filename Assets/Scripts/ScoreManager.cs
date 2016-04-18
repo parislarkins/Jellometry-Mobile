@@ -5,26 +5,23 @@ using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour {
 
-	public int score = 0;        // The player's score.
+    // Initialize
+	public int score = 0; // Players score
 	public int health;
-	public int damageTaken;
+    public float damageTaken; // used in other scripts
+
+    // Wave related
 	int remaining;
 	public int waveKilled;
 	public int wave = 1;
 	
-	private DateTime startTime;
-	public Text healthText;      // Reference to the Text component.
+	public Text healthText; // Reference to the Text component.
 	public Text scoreText;
 	public Text waveText;
 	public Text remainingText;
 
-	// Use this for initialization
 	void Awake () {
-		// Set up the reference.
-		startTime = DateTime.Now;
-		//healthText = GetComponentInChildren.<Text>();
-		//scoreText = GetComponentInChildren.<Text>();
-		// Reset the score.
+        // Reset
 		score = 0;
 		health = 100;
 		wave = 1;

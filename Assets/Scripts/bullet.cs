@@ -5,9 +5,12 @@ public class bullet : MonoBehaviour {
 
 	GameObject parent;
 
+    // Bullet collides with object
 	void OnCollisionEnter (Collision collision){
-		Debug.Log (collision.gameObject.tag);
-		switch (collision.gameObject.tag) {
+		Debug.Log (collision.gameObject.tag); // Tag of object to debug console
+		
+        // Test what is hit
+        switch (collision.gameObject.tag) {
 			case "tank":
 					collision.gameObject.SendMessage("TakeDamage", 20);
 				break;
